@@ -1,6 +1,6 @@
 # CASSETTE.OS
 
-> **[📥 DOWNLOAD LATEST WINDOWS APP (.exe)](https://github.com/Adisama404/Cassette-os/releases/download/v0.0.1/Cassette.OS.Setup.0.0.0.exe)**
+> **[📥 DOWNLOAD LATEST WINDOWS APP (.exe)](https://github.com/Adisama404/Cassette-os/raw/main/dist_electron/Cassette%20OS%20Setup%200.0.0.exe)**
 >
 > *Warning: This is an Alpha release.*
 
