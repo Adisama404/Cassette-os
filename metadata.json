@@ -1,0 +1,5 @@
+{
+  "name": "CASSETTE.OS",
+  "description": "A personal, offline-first music player inspired by retro cassette decks. Mechanical, tactile, and intentional listening.",
+  "requestFramePermissions": []
+}

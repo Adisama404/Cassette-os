@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CASSETTE.OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ['"JetBrains Mono"', 'monospace'],
+              hand: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              deck: {
+                base: '#111111',
+                metal: '#222222',
+                light: '#e5e5e5',
+                led: {
+                  green: '#39ff14',
+                  red: '#ff0033',
+                  off: '#2a1a1a',
+                }
+              }
+            },
+            animation: {
+              'spin-slow': 'spin 3s linear infinite',
+              'spin-fast': 'spin 0.5s linear infinite',
+              'pulse-led': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'marquee': 'marquee 10s linear infinite',
+            },
+            keyframes: {
+              marquee: {
+                '0%': { transform: 'translateX(100%)' },
+                '100%': { transform: 'translateX(-100%)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505;
+        color: #e5e5e5;
+        overflow-x: hidden;
+      }
+      .grain-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #111; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555; 
+      }
+      .mechanical-shadow {
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.5), -1px -1px 2px rgba(255,255,255,0.05);
+      }
+      .mechanical-inset {
+        box-shadow: inset 2px 2px 5px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.05);
+      }
+
+      /* --- ANIMATIONS --- */
+      
+      /* High-quality heavy easing */
+      :root {
+        --ease-mechanical: cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      @keyframes enter-slide-up {
+        0% {
+          opacity: 0;
+          transform: translateY(20px) scale(0.98);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes enter-soft-fade {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+
+      @keyframes tape-insert {
+        0% {
+          opacity: 0;
+          transform: translateY(40px) scale(0.95);
+        }
+        60% {
+          opacity: 1;
+          transform: translateY(-5px); 
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      .animate-enter {
+        animation: enter-slide-up 0.8s var(--ease-mechanical) forwards;
+      }
+      
+      .animate-fade {
+        animation: enter-soft-fade 0.5s ease-out forwards;
+      }
+
+      .animate-tape-insert {
+        animation: tape-insert 0.6s var(--ease-mechanical) forwards;
+      }
+
+      /* Stagger delays */
+      .stagger-1 { animation-delay: 50ms; }
+      .stagger-2 { animation-delay: 100ms; }
+      .stagger-3 { animation-delay: 150ms; }
+      .stagger-4 { animation-delay: 200ms; }
+      .stagger-5 { animation-delay: 250ms; }
+      
+      /* Dynamic stagger generator handled in JS for long lists, 
+         but these are good for static UI elements */
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <div class="grain-overlay"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
