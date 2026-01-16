@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Playlist, CassetteTheme } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
 
 interface CassetteTapeProps {
     playlist?: Playlist;
@@ -15,6 +16,7 @@ interface CassetteTapeProps {
 export const CassetteTapeBase: React.FC<CassetteTapeProps> = ({
     playlist,
     isInserted = false,
+    isPlaying = false,
     className = '',
     style,
     onClick,
@@ -131,6 +133,18 @@ export const CassetteTapeBase: React.FC<CassetteTapeProps> = ({
         }
     }, [theme]);
 
+    const fontClass = useMemo(() => {
+        const font = playlist?.font || 'hand';
+        switch (font) {
+            case 'marker': return 'font-marker tracking-wide font-normal';
+            case 'hand': return 'font-hand tracking-tighter font-bold';
+            case 'pencil': return 'font-pencil tracking-normal text-2xl font-bold';
+            case 'typewriter': return 'font-typewriter tracking-tight text-xs font-bold';
+            case 'sans': return 'font-sans tracking-widest font-bold';
+            default: return 'font-hand tracking-tighter font-bold';
+        }
+    }, [playlist?.font]);
+
     return (
         <div
             onClick={onClick}
@@ -173,7 +187,7 @@ export const CassetteTapeBase: React.FC<CassetteTapeProps> = ({
                 )}
 
                 {/* Handwritten Text */}
-                <div className={`font-hand text-lg md:text-xl font-bold tracking-tighter uppercase relative z-10 text-center line-clamp-2 ${themeStyles.text}`}>
+                <div className={`${fontClass} text-lg md:text-xl uppercase relative z-10 text-center line-clamp-2 ${themeStyles.text}`}>
                     {playlist ? playlist.name : (previewTheme ? 'PREVIEW TAPE' : 'BLANK TAPE')}
                 </div>
 
@@ -191,7 +205,7 @@ export const CassetteTapeBase: React.FC<CassetteTapeProps> = ({
                 {/* Left Reel */}
                 <div
                     ref={leftReelRef}
-                    className={`w-12 h-12 rounded-full border-4 mr-4 flex items-center justify-center relative ${themeStyles.reel}`}
+                    className={`w-12 h-12 rounded-full border-4 mr-4 flex items-center justify-center relative ${themeStyles.reel} ${(!isInserted && isPlaying) ? 'animate-[spin_2s_linear_infinite]' : (!isInserted ? 'group-hover:animate-[spin_2s_linear_infinite]' : '')}`}
                 >
                     <div className="absolute inset-0 border-4 border-dashed border-current opacity-50 rounded-full"></div>
                     <div className="w-1 h-full bg-current opacity-30 rotate-45"></div>
@@ -201,7 +215,7 @@ export const CassetteTapeBase: React.FC<CassetteTapeProps> = ({
                 {/* Right Reel */}
                 <div
                     ref={rightReelRef}
-                    className={`w-12 h-12 rounded-full border-4 ml-4 flex items-center justify-center relative ${themeStyles.reel}`}
+                    className={`w-12 h-12 rounded-full border-4 ml-4 flex items-center justify-center relative ${themeStyles.reel} ${(!isInserted && isPlaying) ? 'animate-[spin_2s_linear_infinite]' : (!isInserted ? 'group-hover:animate-[spin_2s_linear_infinite]' : '')}`}
                 >
                     <div className="absolute inset-0 border-4 border-dashed border-current opacity-50 rounded-full"></div>
                     <div className="w-1 h-full bg-current opacity-30 rotate-45"></div>

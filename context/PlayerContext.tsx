@@ -12,9 +12,12 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [volume, setVolumeState] = useState<number>(0.8);
+  const [isShuffled, setIsShuffled] = useState<boolean>(false);
 
   // Initialize audio object lazily but synchronously
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // ... (keeping existing audio init)
   if (!audioRef.current) {
     audioRef.current = new Audio();
     audioRef.current.preload = 'metadata';
@@ -23,6 +26,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const rafRef = useRef<number | null>(null);
 
   // --- AUDIO HELPER ---
+  // ... (keep cleanupCurrentSrc and loadTrack same as before)
 
   const cleanupCurrentSrc = () => {
     if (audioRef.current && audioRef.current.src && audioRef.current.src.startsWith('blob:')) {
@@ -33,55 +37,51 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadTrack = (track: Track) => {
     if (!audioRef.current) return;
-
-    // Clean up previous blob URL
     cleanupCurrentSrc();
-
     if (track.path) {
-      // Native Electron Path
       audioRef.current.src = `file://${track.path}`;
       audioRef.current.load();
     } else if (track.fileHandle && track.fileHandle instanceof Blob) {
-      // Web File Handle
       try {
         const url = URL.createObjectURL(track.fileHandle);
         audioRef.current.src = url;
         audioRef.current.load();
       } catch (error) {
-        console.error("Failed to create Object URL for track:", track.title, error);
+        console.error("Failed", error);
       }
     } else {
-      console.warn("File handle and Path missing for track:", track.title);
+      console.warn("Missing file info");
     }
   };
 
+
   // --- CONTROLS ---
 
+  const toggleShuffle = () => setIsShuffled(prev => !prev);
+
   const play = async () => {
+    // ... existing play implementation
     if (!currentPlaylist) return;
-    if (playbackState === PlaybackState.PLAYING) return;
+    if (playbackState === PlaybackState.PLAYING && !audioRef.current?.paused) return;
     if (!audioRef.current) return;
 
     try {
-      // If we are starting from stopped/no_tape, or if src is empty
       if ((playbackState === PlaybackState.NO_TAPE || playbackState === PlaybackState.STOPPED) || !audioRef.current.src) {
         const track = currentPlaylist.tracks[currentTrackIndex];
-        // If src is empty or invalid, load the track
         if (track && (!audioRef.current.src || audioRef.current.src === window.location.href)) {
           loadTrack(track);
         }
       }
-
       await audioRef.current.play();
       setPlaybackState(PlaybackState.PLAYING);
     } catch (e) {
       console.error("Play failed:", e);
-      // If play fails (e.g. empty src), ensure state reflects that
       setPlaybackState(PlaybackState.STOPPED);
     }
   };
 
   const pause = () => {
+    // ... existing pause
     if (audioRef.current) {
       audioRef.current.pause();
       setPlaybackState(PlaybackState.PAUSED);
@@ -89,6 +89,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const stop = () => {
+    // ... existing stop
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -99,18 +100,38 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const next = () => {
     if (!currentPlaylist) return;
-    let nextIndex = currentTrackIndex + 1;
-    if (nextIndex >= currentPlaylist.tracks.length) {
-      stop();
-      return;
+
+    let nextIndex;
+    if (isShuffled && currentPlaylist.tracks.length > 1) {
+      // Random index different from current
+      do {
+        nextIndex = Math.floor(Math.random() * currentPlaylist.tracks.length);
+      } while (nextIndex === currentTrackIndex);
+    } else {
+      nextIndex = currentTrackIndex + 1;
     }
+
+    if (nextIndex >= currentPlaylist.tracks.length) {
+      // If we are shuffling, we might want to just stop or loop? 
+      // For now, if we hit the limit in sequential, we stop. 
+      // In shuffle, we never strictly "hit the limit" unless we track play history, 
+      // but my simple random implementation handles index validity naturally.
+      // However, if sequential and end reached:
+      if (!isShuffled) {
+        stop();
+        return;
+      }
+    }
+
+    // Bounds safety
+    if (nextIndex >= currentPlaylist.tracks.length) nextIndex = 0;
+
     setCurrentTrackIndex(nextIndex);
 
     const wasPlaying = playbackState === PlaybackState.PLAYING;
     loadTrack(currentPlaylist.tracks[nextIndex]);
 
     if (wasPlaying) {
-      // Short timeout to ensure load processes
       setTimeout(() => play(), 0);
     } else {
       setPlaybackState(PlaybackState.STOPPED);
@@ -139,6 +160,17 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const playTrack = (index: number) => {
+    if (!currentPlaylist) return;
+    if (index < 0 || index >= currentPlaylist.tracks.length) return;
+
+    setCurrentTrackIndex(index);
+    loadTrack(currentPlaylist.tracks[index]);
+
+    // Use setTimeout to ensure the load processes before playing
+    setTimeout(() => play(), 0);
+  };
+
   const seek = (time: number) => {
     if (audioRef.current) {
       const t = Math.max(0, Math.min(time, duration));
@@ -155,12 +187,25 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const loadPlaylist = (playlist: Playlist) => {
+  const loadPlaylist = (playlist: Playlist, startIndex: number = 0, autoPlay: boolean = false) => {
     stop();
     setCurrentPlaylist(playlist);
-    setCurrentTrackIndex(0);
-    if (playlist.tracks[0]) loadTrack(playlist.tracks[0]);
-    setPlaybackState(PlaybackState.STOPPED);
+
+    const index = Math.max(0, Math.min(startIndex, playlist.tracks.length - 1));
+    setCurrentTrackIndex(index);
+
+    if (playlist.tracks[index]) {
+      loadTrack(playlist.tracks[index]);
+      if (autoPlay) {
+        setTimeout(() => {
+          play().catch(console.error);
+        }, 50);
+      } else {
+        setPlaybackState(PlaybackState.STOPPED);
+      }
+    } else {
+      setPlaybackState(PlaybackState.STOPPED);
+    }
   };
 
   const eject = () => {
@@ -254,6 +299,32 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     await savePlaylist(updatedPlaylist);
     setPlaylists(prev => prev.map(p => p.id === playlistId ? updatedPlaylist : p));
     if (currentPlaylist?.id === playlistId) setCurrentPlaylist(updatedPlaylist);
+  };
+
+  const reorderTrack = async (playlistId: string, fromIndex: number, toIndex: number) => {
+    const playlist = playlists.find(p => p.id === playlistId);
+    if (!playlist) return;
+
+    const newTracks = [...playlist.tracks];
+    const [movedTrack] = newTracks.splice(fromIndex, 1);
+    newTracks.splice(toIndex, 0, movedTrack);
+
+    const updatedPlaylist = { ...playlist, tracks: newTracks };
+
+    await savePlaylist(updatedPlaylist);
+    setPlaylists(prev => prev.map(p => p.id === playlistId ? updatedPlaylist : p));
+
+    if (currentPlaylist?.id === playlistId) {
+      setCurrentPlaylist(updatedPlaylist);
+      // Correct the current track index if needed
+      if (currentTrackIndex === fromIndex) {
+        setCurrentTrackIndex(toIndex);
+      } else if (currentTrackIndex > fromIndex && currentTrackIndex <= toIndex) {
+        setCurrentTrackIndex(currentTrackIndex - 1);
+      } else if (currentTrackIndex < fromIndex && currentTrackIndex >= toIndex) {
+        setCurrentTrackIndex(currentTrackIndex + 1);
+      }
+    }
   };
 
   // --- EFFECTS ---
@@ -362,7 +433,11 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       addTracksToPlaylist,
       removeTrackFromPlaylist,
       playlists,
-      setVolume
+      setVolume,
+      playTrack,
+      isShuffled,
+      toggleShuffle,
+      reorderTrack
     }}>
       {children}
     </PlayerContext.Provider>

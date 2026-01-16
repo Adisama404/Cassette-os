@@ -1,13 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Permanent+Marker&family=Courier+Prime:wght@400;700&family=Dancing+Script:wght@700&family=VT323&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
 /* Global Styles */
 
-.doodle-bg {
-    /* Deep void black */
-    background-color: #050505;
-
+:root {
+    --bg-color: #050505;
     /* Chaotic Emo Pattern */
-    background-image: url("data:image/svg+xml,%3Csvg width='600' height='600' viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cstyle%3E .emo { fill: none; stroke: %23333; stroke-width: 2; opacity: 0.3; stroke-linejoin: bevel; stroke-linecap: square; } .heavy { stroke-width: 3; stroke: %23444; opacity: 0.4; } .scratch { stroke: %23222; stroke-width: 1; stroke-dasharray: 10,5; } %3C/style%3E%3C!-- Background Chaos Lines --%3E%3Cpath class='emo scratch' d='M0 0 L600 600 M600 0 L0 600' /%3E%3Cpath class='emo scratch' d='M100 0 L0 100 M600 500 L500 600' /%3E%3C!-- 1. Aggressive Skull --%3E%3Cg transform='translate(100, 100) rotate(-15)'%3E%3Cpath class='emo heavy' d='M0 0 Q-25 -25 0 -50 Q25 -25 0 0 Z' /%3E%3Cpath class='emo' d='M-8 0 L-8 12 M0 0 L0 12 M8 0 L8 12' /%3E%3Cpath class='emo' d='M-10 -30 L-4 -36 M-4 -30 L-10 -36' /%3E%3Cpath class='emo' d='M4 -30 L10 -36 M10 -30 L4 -36' /%3E%3C/g%3E%3C!-- 2. Spiderweb --%3E%3Cg transform='translate(500, 100)'%3E%3Cpath class='emo' d='M0 0 L-60 60 M0 0 L-60 -20 M0 0 L-20 60' /%3E%3Cpath class='emo' d='M-30 30 Q-20 20 -30 0 M-45 45 Q-30 30 -45 15' fill='none'/%3E%3C/g%3E%3C!-- 3. Anarchy A --%3E%3Cg transform='translate(300, 300) scale(1.8)'%3E%3Ccircle class='emo' cx='0' cy='0' r='20' /%3E%3Cpath class='emo heavy' d='M0 -20 L-12 18 M0 -20 L12 18 M-10 2 L10 2' /%3E%3C/g%3E%3C!-- 4. NO Text Scribble --%3E%3Cg transform='translate(150, 400) rotate(10)'%3E%3Cpath class='emo heavy' d='M0 0 L0 30 L20 0 L20 30' /%3E%3Ccircle class='emo heavy' cx='45' cy='15' r='15' /%3E%3Cpath class='emo' d='M-10 15 L70 15' /%3E%3C/g%3E%3C!-- 5. Jagged Scratches --%3E%3Cpath class='emo' d='M400 500 L420 480 L430 510 L450 490 L460 520' /%3E%3C!-- 6. Dripping Eye --%3E%3Cg transform='translate(500, 450)'%3E%3Cpath class='emo' d='M0 0 Q20 -15 40 0 Q20 15 0 0' /%3E%3Ccircle class='emo' cx='20' cy='0' r='4' /%3E%3Cpath class='emo' d='M20 5 L20 30 Q20 35 25 30' /%3E%3C/g%3E%3C!-- 7. Random Mess --%3E%3Cpath class='emo' d='M50 500 Q100 600 150 500 T250 500' stroke-dasharray='2,2' /%3E%3C/svg%3E");
+    --bg-pattern: url("data:image/svg+xml,%3Csvg width='600' height='600' viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cstyle%3E .emo { fill: none; stroke: %23333; stroke-width: 2; opacity: 0.3; stroke-linejoin: bevel; stroke-linecap: square; } .heavy { stroke-width: 3; stroke: %23444; opacity: 0.4; } .scratch { stroke: %23222; stroke-width: 1; stroke-dasharray: 10,5; } %3C/style%3E%3C!-- Background Chaos Lines --%3E%3Cpath class='emo scratch' d='M0 0 L600 600 M600 0 L0 600' /%3E%3Cpath class='emo scratch' d='M100 0 L0 100 M600 500 L500 600' /%3E%3C!-- 1. Aggressive Skull --%3E%3Cg transform='translate(100, 100) rotate(-15)'%3E%3Cpath class='emo heavy' d='M0 0 Q-25 -25 0 -50 Q25 -25 0 0 Z' /%3E%3Cpath class='emo' d='M-8 0 L-8 12 M0 0 L0 12 M8 0 L8 12' /%3E%3Cpath class='emo' d='M-10 -30 L-4 -36 M-4 -30 L-10 -36' /%3E%3Cpath class='emo' d='M4 -30 L10 -36 M10 -30 L4 -36' /%3E%3C/g%3E%3C!-- 2. Spiderweb --%3E%3Cg transform='translate(500, 100)'%3E%3Cpath class='emo' d='M0 0 L-60 60 M0 0 L-60 -20 M0 0 L-20 60' /%3E%3Cpath class='emo' d='M-30 30 Q-20 20 -30 0 M-45 45 Q-30 30 -45 15' fill='none'/%3E%3C/g%3E%3C!-- 3. Anarchy A --%3E%3Cg transform='translate(300, 300) scale(1.8)'%3E%3Ccircle class='emo' cx='0' cy='0' r='20' /%3E%3Cpath class='emo heavy' d='M0 -20 L-12 18 M0 -20 L12 18 M-10 2 L10 2' /%3E%3C/g%3E%3C!-- 4. NO Text Scribble --%3E%3Cg transform='translate(150, 400) rotate(10)'%3E%3Cpath class='emo heavy' d='M0 0 L0 30 L20 0 L20 30' /%3E%3Ccircle class='emo heavy' cx='45' cy='15' r='15' /%3E%3Cpath class='emo' d='M-10 15 L70 15' /%3E%3C/g%3E%3C!-- 5. Jagged Scratches --%3E%3Cpath class='emo' d='M400 500 L420 480 L430 510 L450 490 L460 520' /%3E%3C!-- 6. Dripping Eye --%3E%3Cg transform='translate(500, 450)'%3E%3Cpath class='emo' d='M0 0 Q20 -15 40 0 Q20 15 0 0' /%3E%3Ccircle class='emo' cx='20' cy='0' r='4' /%3E%3Cpath class='emo' d='M20 5 L20 30 Q20 35 25 30' /%3E%3C/g%3E%3C!-- 7. Random Mess --%3E%3Cpath class='emo' d='M50 500 Q100 600 150 500 T250 500' stroke-dasharray='2,2' /%3E%3C/svg%3E");
+    --bg-size: 600px 600px;
+    --accent-color: #22c55e;
+    --accent-glow: rgba(34, 197, 94, 0.3);
 
-    background-size: 600px 600px;
+    /* Deck (Default Metal/Dark) */
+    --deck-bg: #1a1a1a;
+    --deck-border: #292524;
+    --deck-surface-pattern: url('https://www.transparenttextures.com/patterns/stardust.png');
+    --deck-screws: #111;
+
+    /* LCD (Cyber Green) */
+    --lcd-bg: #000000;
+    --lcd-border: #292524;
+    --lcd-text: #22c55e;
+    --lcd-subtext: #14532d;
+    --lcd-shadow: rgba(0, 0, 0, 1);
+
+    /* Fonts (Mono/Cyber) */
+    --font-display: 'Courier Prime', monospace;
+    --font-ui: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Buttons (Default Metal) */
+    --button-face: #44403c;
+    --button-side: #1c1917;
+    --button-border: #0c0a09;
+    --knob-face: #292524;
+}
+
+.theme-blue-note {
+    --bg-color: #1a0f0a;
+    --bg-pattern: url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+    --bg-size: auto;
+    --accent-color: #eab308;
+    --accent-glow: rgba(234, 179, 8, 0.3);
+
+    /* Deck (Wood/Gold) */
+    --deck-bg: #3f2e18;
+    /* Rich wood */
+    --deck-border: #593c1f;
+    --deck-surface-pattern: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+    --deck-screws: #854d0e;
+    /* Brass */
+
+    /* LCD (Warm/Amber) */
+    --lcd-bg: #271c10;
+    --lcd-border: #713f12;
+    --lcd-text: #fbbf24;
+    --lcd-subtext: #92400e;
+    --lcd-shadow: rgba(30, 15, 0, 0.8);
+
+    /* Fonts (Serif/Elegant) */
+    --font-display: 'Playfair Display', serif;
+    --font-ui: 'Playfair Display', serif;
+
+    /* Buttons (Bakelite/Gold) */
+    --button-face: #78350f;
+    --button-side: #451a03;
+    --button-border: #2e1005;
+    --knob-face: #92400e;
+}
+
+.theme-grunge {
+    --bg-color: #1c1917;
+    --bg-pattern: url("https://www.transparenttextures.com/patterns/concrete-wall-2.png");
+    --bg-size: auto;
+    --accent-color: #78716c;
+    --accent-glow: rgba(120, 113, 108, 0.5);
+
+    /* Deck (Dirty/Textured) */
+    --deck-bg: #292524;
+    --deck-border: #0c0a09;
+    --deck-surface-pattern: url('https://www.transparenttextures.com/patterns/cracked-concrete.png');
+    --deck-screws: #44403c;
+
+    /* LCD (Toxic/Dirty) */
+    --lcd-bg: #0c0a09;
+    --lcd-border: #1c1917;
+    --lcd-text: #84cc16;
+    --lcd-subtext: #365314;
+    --lcd-shadow: rgba(0, 0, 0, 0.9);
+
+    /* Fonts (Rough/Marker) */
+    --font-display: 'Permanent Marker', cursive;
+    --font-ui: 'Permanent Marker', cursive;
+
+    /* Buttons (Rusted Industrial) */
+    --button-face: #57534e;
+    --button-side: #292524;
+    --button-border: #1c1917;
+    --knob-face: #44403c;
+}
+
+.doodle-bg {
+    /* Deep void black / Variable */
+    background-color: var(--bg-color);
+
+    /* Chaotic Emo Pattern / Variable */
+    background-image: var(--bg-pattern);
+
+    background-size: var(--bg-size);
+    transition: background-color 0.5s ease, background-image 0.5s ease;
+}
+
+/* Font Styles */
+.font-hand {
+    font-family: 'Caveat', cursive;
+}
+
+.font-marker {
+    font-family: 'Permanent Marker', cursive;
+}
+
+.font-elegant {
+    font-family: 'Dancing Script', cursive;
+}
+
+.font-pixel {
+    font-family: 'VT323', monospace;
+}
+
+.font-typewriter {
+    font-family: 'Courier Prime', monospace;
 }
 
 /* Paper Grain Texture Overlay */
@@ -34,4 +154,85 @@
     pointer-events: none;
     z-index: 2;
     background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+/* Animations */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-4px) rotate(-2deg);
+    }
+
+    40% {
+        transform: translateX(4px) rotate(2deg);
+    }
+
+    60% {
+        transform: translateX(-2px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translateX(2px) rotate(1deg);
+    }
+}
+
+.animate-shake {
+    animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes tape-insert {
+    0% {
+        transform: translateY(-120%) scale(0.9);
+        opacity: 0;
+    }
+
+    60% {
+        transform: translateY(5%) scale(1.02);
+        opacity: 1;
+    }
+
+    80% {
+        transform: translateY(-2%) scale(0.98);
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-tape-insert {
+    animation: tape-insert 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes enter {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-enter {
+    animation: enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.stagger-1 {
+    animation-delay: 100ms;
+}
+
+.stagger-2 {
+    animation-delay: 200ms;
+}
+
+.stagger-3 {
+    animation-delay: 300ms;
 }

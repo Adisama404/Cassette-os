@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { usePlayer } from '../context/PlayerContext';
-import { Playlist, CassetteTheme } from '../types';
+import { Playlist, CassetteTheme, Track } from '../types';
 import { useHaptics } from './useHaptics';
 
 interface TapeShelfLogic {
     playlists: Playlist[];
     filteredPlaylists: Playlist[];
+    foundTracks: { track: Track, playlist: Playlist, index: number }[];
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     contextMenu: { x: number; y: number; playlist: Playlist } | null;
@@ -26,6 +27,19 @@ export const useTapeShelf = (): TapeShelfLogic => {
     const filteredPlaylists = useMemo(() =>
         playlists.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())),
         [playlists, searchQuery]);
+
+    const foundTracks = useMemo(() => {
+        if (!searchQuery) return [];
+        const results: { track: Track, playlist: Playlist, index: number }[] = [];
+        playlists.forEach(playlist => {
+            playlist.tracks.forEach((track, index) => {
+                if (track.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+                    results.push({ track, playlist, index });
+                }
+            });
+        });
+        return results;
+    }, [playlists, searchQuery]);
 
     // Close context menu on global click
     useEffect(() => {
@@ -75,6 +89,7 @@ export const useTapeShelf = (): TapeShelfLogic => {
     return {
         playlists,
         filteredPlaylists,
+        foundTracks,
         searchQuery,
         setSearchQuery,
         contextMenu,

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Deck } from '../components/Deck/Deck';
 import { MechanicalButton } from '../components/Controls/MechanicalButton';
 import { VolumeFader } from '../components/Controls/VolumeFader';
 import { usePlayer } from '../context/PlayerContext';
+import { useMechanicalSounds } from '../hooks/useMechanicalSounds';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, ArrowUpFromLine } from 'lucide-react';
 import { PlaybackState } from '../types';
 import { useNavigate } from 'react-router-dom';
@@ -14,26 +15,69 @@ export const HomePage: React.FC = () => {
     const isPlaying = playbackState === PlaybackState.PLAYING;
     const hasTape = !!currentPlaylist;
 
+    // 3D Tilt Effect Logic
+    const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            const { innerWidth, innerHeight } = window;
+            const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+            const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+            setTilt({ x, y });
+        };
+
+        const handleOrientation = (e: DeviceOrientationEvent) => {
+            if (e.gamma === null || e.beta === null) return;
+            // Gamma: Left/Right (-90 to 90) => Map to X (-1 to 1)
+            // Smaller divisor = higher sensitivity
+            const x = Math.max(-1, Math.min(1, e.gamma / 25));
+
+            // Beta: Front/Back. Phone usually held at ~45deg.
+            // Map 45deg to 0. 
+            const y = Math.max(-1, Math.min(1, (e.beta - 45) / 25));
+
+            setTilt({ x, y });
+        };
+
+        // Simple feature detection for mobile
+        if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
+            window.addEventListener('deviceorientation', handleOrientation);
+        } else {
+            window.addEventListener('mousemove', handleMouseMove);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('deviceorientation', handleOrientation);
+        };
+    }, []);
+
     return (
-        <div className="min-h-screen flex flex-col items-center pt-6 pb-32 px-4 animate-enter bg-[#0a0a0a]">
+        <div className="min-h-screen flex flex-col items-center pt-6 pb-32 px-4 animate-enter bg-transparent">
 
             {/* Brand Header */}
-            <div className="w-full max-w-2xl flex justify-between items-end mb-6 border-b border-stone-800/50 pb-2 px-2">
+            <div className="w-full max-w-2xl flex justify-between items-end mb-6 border-b border-[var(--deck-border)] pb-2 px-2" style={{ borderColor: 'var(--deck-border)' }}>
                 <div className="flex flex-col">
-                    <h1 className="font-mono text-2xl tracking-[0.2em] text-stone-300 font-bold flex items-center gap-2">
+                    <h1 className="font-mono text-2xl tracking-[0.2em] font-bold flex items-center gap-2" style={{ color: 'var(--lcd-text)', fontFamily: 'var(--font-display)' }}>
                         CASSETTE.OS
-                        <div className="w-2 h-2 bg-green-900 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 rounded-full animate-pulse bg-[var(--lcd-text)]"></div>
                     </h1>
-                    <span className="text-[0.6rem] font-mono text-stone-600 uppercase tracking-widest pl-1">High Fidelity Personal Audio</span>
+                    <span className="text-[0.6rem] font-mono uppercase tracking-widest pl-1 opacity-70" style={{ color: 'var(--lcd-subtext)' }}>High Fidelity Personal Audio</span>
                 </div>
-                <div className="flex space-x-6 text-[0.65rem] font-mono font-bold text-stone-600 tracking-wider">
-                    <button onClick={() => navigate('/')} className="hover:text-green-500 transition-colors uppercase">Return to Shelf</button>
-                    <button onClick={() => navigate('/settings')} className="hover:text-green-500 transition-colors uppercase">System</button>
+                <div className="flex space-x-6 text-[0.65rem] font-mono font-bold tracking-wider opacity-60 hover:opacity-100 transition-opacity" style={{ color: 'var(--lcd-subtext)' }}>
+                    <button onClick={() => navigate('/')} className="hover:text-[var(--accent-color)] transition-colors uppercase">Return to Shelf</button>
+                    <button onClick={() => navigate('/settings')} className="hover:text-[var(--accent-color)] transition-colors uppercase">System</button>
                 </div>
             </div>
 
             {/* Main Deck Unit */}
-            <div className="mb-8 w-full flex justify-center">
+            <div
+                className="mb-4 sm:mb-8 w-full flex justify-center will-change-transform"
+                style={{
+                    transform: `perspective(1000px) rotateX(${-tilt.y * 3}deg) rotateY(${tilt.x * 3}deg)`,
+                    transition: 'transform 0.1s ease-out'
+                }}
+            >
                 <Deck />
             </div>
 
@@ -42,10 +86,10 @@ export const HomePage: React.FC = () => {
             <div className="w-full max-w-xl relative">
 
                 {/* Panel Background */}
-                <div className="absolute inset-0 bg-stone-900 rounded-lg shadow-2xl border-t border-white/5 border-b border-black"></div>
+                <div className="absolute inset-0 rounded-lg shadow-2xl border-t border-white/5 border-b border-black transition-colors duration-500" style={{ backgroundColor: 'var(--deck-bg)', borderColor: 'var(--deck-border)' }}></div>
 
                 {/* Brushed Metal Texture Overlay */}
-                <div className="absolute inset-0 opacity-5 rounded-lg pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/brushed-alum-dark.png')]"></div>
+                <div className="absolute inset-0 opacity-10 rounded-lg pointer-events-none transition-all duration-500" style={{ backgroundImage: 'var(--deck-surface-pattern)' }}></div>
 
                 {/* Screw details */}
                 <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-black/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)] flex items-center justify-center"><div className="w-1.5 h-[1px] bg-stone-700 rotate-45"></div></div>
@@ -54,10 +98,10 @@ export const HomePage: React.FC = () => {
                 <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-black/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)] flex items-center justify-center"><div className="w-1.5 h-[1px] bg-stone-700 rotate-0"></div></div>
 
                 {/* Controls Container */}
-                <div className="relative z-10 p-4 sm:p-8 flex justify-center items-end gap-4 sm:gap-8">
+                <div className="relative z-10 p-3 sm:p-8 flex justify-center items-end gap-2 sm:gap-8">
 
                     {/* Volume Control (Left Side) */}
-                    <div className="mr-2 sm:mr-4">
+                    <div className="mr-1 sm:mr-4">
                         <VolumeFader
                             volume={volume}
                             onChange={setVolume}
@@ -106,7 +150,7 @@ export const HomePage: React.FC = () => {
                         label="EJECT"
                         color="orange"
                         disabled={!hasTape}
-                        className="stagger-4 animate-enter ml-2 sm:ml-4"
+                        className="stagger-4 animate-enter ml-1 sm:ml-4"
                     />
 
                 </div>

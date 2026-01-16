@@ -46,7 +46,7 @@ export const VolumeFader: React.FC<VolumeFaderProps> = ({ volume, onChange, clas
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
-                className="h-32 w-8 sm:w-10 bg-[#111] rounded-lg relative border border-stone-800 shadow-[inset_0_2px_10px_rgba(0,0,0,1)] cursor-ns-resize overflow-visible touch-none"
+                className="h-28 sm:h-32 w-7 sm:w-10 bg-[#111] rounded-lg relative border border-stone-800 shadow-[inset_0_2px_10px_rgba(0,0,0,1)] cursor-ns-resize overflow-visible touch-none"
             >
                 {/* Track Markings */}
                 <div className="absolute top-2 bottom-2 left-1/2 -translate-x-1/2 w-[2px] bg-[#222]"></div>
@@ -64,8 +64,8 @@ export const VolumeFader: React.FC<VolumeFaderProps> = ({ volume, onChange, clas
                 <div
                     className={`
                 absolute left-1/2 -translate-x-1/2 w-6 h-8 sm:w-8 sm:h-10 
-                bg-gradient-to-b from-stone-700 to-stone-800 
-                border-t border-stone-600 border-b-2 border-b-black
+                bg-gradient-to-b from-[var(--knob-face)] to-[var(--button-side)] 
+                border-t border-[var(--button-face)] border-b-2 border-b-black
                 rounded shadow-xl z-10
                 flex items-center justify-center
                 transition-transform duration-75 ease-out

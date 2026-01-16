@@ -18,6 +18,7 @@ export interface Playlist {
   coverColor?: string;
   theme: CassetteTheme;
   totalDuration: number;
+  font?: 'sans' | 'hand' | 'marker' | 'typewriter' | 'pencil';
 }
 
 export enum PlaybackState {
@@ -45,7 +46,7 @@ export interface PlayerContextType extends PlayerState {
   next: () => void;
   prev: () => void;
   seek: (time: number) => void;
-  loadPlaylist: (playlist: Playlist) => void;
+  loadPlaylist: (playlist: Playlist, startIndex?: number, autoPlay?: boolean) => void;
   eject: () => void;
   addPlaylist: (name: string, files: (File | { path: string; name: string })[], theme: CassetteTheme) => Promise<void>;
   updatePlaylist: (playlist: Playlist) => Promise<void>;
@@ -54,4 +55,8 @@ export interface PlayerContextType extends PlayerState {
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => Promise<void>;
   playlists: Playlist[];
   setVolume: (vol: number) => void;
+  playTrack: (index: number) => void;
+  isShuffled: boolean;
+  toggleShuffle: () => void;
+  reorderTrack: (playlistId: string, fromIndex: number, toIndex: number) => Promise<void>;
 }

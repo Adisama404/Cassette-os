@@ -2,9 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePlayer } from '../../context/PlayerContext';
 import { PlaybackState } from '../../types';
 import { CassetteTape } from './CassetteTape';
+import { WavyProgressBar } from '../UI/WavyProgressBar';
+import { Shuffle } from 'lucide-react';
 
 export const Deck: React.FC = () => {
-    const { currentPlaylist, playbackState, currentTrackIndex, currentTime, duration, seek } = usePlayer();
+    const { currentPlaylist, playbackState, currentTrackIndex, currentTime, duration, seek, isShuffled, toggleShuffle } = usePlayer();
+
+    const [shaking, setShaking] = useState(false);
+
+    const handleShuffle = () => {
+        toggleShuffle();
+        setShaking(true);
+        setTimeout(() => setShaking(false), 500);
+    };
 
     const formatTime = (time: number) => {
         if (isNaN(time)) return "0:00";
@@ -84,18 +94,18 @@ export const Deck: React.FC = () => {
     return (
         <div className="relative w-full max-w-2xl aspect-[1.5] rounded-xl p-4 md:p-8 flex flex-col items-center justify-center animate-enter z-20">
 
-            {/* Deck Chassis Background - Dark Metal */}
-            <div className="absolute inset-0 bg-[#1a1a1a] rounded-xl shadow-2xl border border-stone-800"></div>
-            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] pointer-events-none rounded-xl"></div>
+            {/* Deck Chassis Background */}
+            <div className="absolute inset-0 rounded-xl shadow-2xl border transition-colors duration-500" style={{ backgroundColor: 'var(--deck-bg)', borderColor: 'var(--deck-border)' }}></div>
+            <div className="absolute inset-0 opacity-10 pointer-events-none rounded-xl transition-all duration-500" style={{ backgroundImage: 'var(--deck-surface-pattern)' }}></div>
 
             {/* Cosmetic Screws */}
-            <div className="absolute top-3 left-3 w-3 h-3 rounded-full bg-[#111] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20"><div className="w-full h-[1px] bg-[#333] rotate-45"></div></div>
-            <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-[#111] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20"><div className="w-full h-[1px] bg-[#333] rotate-12"></div></div>
-            <div className="absolute bottom-3 left-3 w-3 h-3 rounded-full bg-[#111] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20"><div className="w-full h-[1px] bg-[#333] rotate-90"></div></div>
-            <div className="absolute bottom-3 right-3 w-3 h-3 rounded-full bg-[#111] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20"><div className="w-full h-[1px] bg-[#333] rotate-0"></div></div>
+            <div className="absolute top-3 left-3 w-3 h-3 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20" style={{ backgroundColor: 'var(--deck-screws)' }}><div className="w-full h-[1px] bg-[#333] rotate-45"></div></div>
+            <div className="absolute top-3 right-3 w-3 h-3 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20" style={{ backgroundColor: 'var(--deck-screws)' }}><div className="w-full h-[1px] bg-[#333] rotate-12"></div></div>
+            <div className="absolute bottom-3 left-3 w-3 h-3 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20" style={{ backgroundColor: 'var(--deck-screws)' }}><div className="w-full h-[1px] bg-[#333] rotate-90"></div></div>
+            <div className="absolute bottom-3 right-3 w-3 h-3 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20" style={{ backgroundColor: 'var(--deck-screws)' }}><div className="w-full h-[1px] bg-[#333] rotate-0"></div></div>
 
             {/* Tape Window / Bay */}
-            <div className="relative w-full h-[70%] bg-[#080808] rounded-lg shadow-[inset_0_10px_20px_rgba(0,0,0,1)] overflow-hidden border-8 border-[#222] flex items-center justify-center z-10">
+            <div className="relative w-full h-[70%] bg-[#080808] rounded-lg shadow-[inset_0_10px_20px_rgba(0,0,0,1)] overflow-hidden border-8 flex items-center justify-center z-10 transition-colors duration-500" style={{ borderColor: 'var(--deck-border)' }}>
 
                 {/* Background Mechanics */}
                 <div className="absolute inset-0 flex justify-between items-center px-[15%] opacity-40 pointer-events-none">
@@ -113,7 +123,7 @@ export const Deck: React.FC = () => {
 
                 {/* The Cassette (if inserted) */}
                 {currentPlaylist ? (
-                    <div key={tapeKey} className="relative w-[90%] z-20 animate-tape-insert transform-gpu">
+                    <div key={tapeKey} className={`relative w-[90%] z-20 transform-gpu ${shaking ? 'animate-shake' : 'animate-tape-insert'}`}>
                         <CassetteTape
                             playlist={currentPlaylist}
                             isInserted={true}
@@ -122,7 +132,8 @@ export const Deck: React.FC = () => {
                         />
                     </div>
                 ) : (
-                    <div className="z-20 text-red-900/50 font-mono animate-pulse text-sm md:text-lg tracking-[0.3em] uppercase border border-red-900/30 px-6 py-3 rounded shadow-[0_0_15px_rgba(153,27,27,0.1)]">
+                    <div className="z-20 font-mono animate-pulse text-sm md:text-lg tracking-[0.3em] uppercase border px-6 py-3 rounded shadow-[0_0_15px_rgba(153,27,27,0.1)] transition-colors"
+                        style={{ color: 'var(--lcd-text)', borderColor: 'var(--lcd-border)', fontFamily: 'var(--font-display)' }}>
                         No Cassette
                     </div>
                 )}
@@ -133,13 +144,17 @@ export const Deck: React.FC = () => {
             </div>
 
             {/* Track Info LCD */}
-            <div className="w-full mt-6 bg-black h-24 rounded border border-stone-800 shadow-[inset_0_2px_10px_rgba(0,0,0,1)] flex flex-col justify-center px-6 font-mono text-green-500 relative overflow-hidden z-10 transition-all duration-300">
+            <div className="w-full mt-3 sm:mt-6 h-20 sm:h-24 rounded border shadow-[inset_0_2px_10px_rgba(0,0,0,1)] flex flex-col justify-center px-4 sm:px-6 relative overflow-hidden z-10 transition-all duration-300"
+                style={{
+                    backgroundColor: 'var(--lcd-bg)',
+                    borderColor: 'var(--lcd-border)',
+                    boxShadow: `inset 0 0 20px var(--lcd-shadow)`,
+                    fontFamily: 'var(--font-display)'
+                }}
+            >
 
                 {/* LCD Grid Texture */}
-                <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(0,255,0,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.2)_1px,transparent_1px)] bg-[size:4px_4px] pointer-events-none"></div>
-
-                {/* Inner Shadow */}
-                <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,1)] pointer-events-none"></div>
+                <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)] bg-[size:4px_4px] pointer-events-none"></div>
 
                 {currentPlaylist ? (
                     <div className="w-full h-full flex flex-col justify-center py-2 animate-fade relative z-10 gap-2">
@@ -147,59 +162,54 @@ export const Deck: React.FC = () => {
                         {/* Top Row: Track & Mode */}
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col">
-                                <span className="text-[10px] text-green-900 uppercase">Track No.</span>
-                                <span className="text-xl md:text-2xl leading-none font-bold tracking-widest text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.5)]">{String(currentTrackIndex + 1).padStart(2, '0')}</span>
+                                <span className="text-[10px] uppercase opacity-70" style={{ color: 'var(--lcd-subtext)' }}>Track No.</span>
+                                <span className="text-xl md:text-2xl leading-none font-bold tracking-widest drop-shadow-md" style={{ color: 'var(--lcd-text)' }}>{String(currentTrackIndex + 1).padStart(2, '0')}</span>
                             </div>
                             <div className="flex flex-col items-center flex-1 mx-4 overflow-hidden">
                                 <div className="whitespace-nowrap overflow-hidden w-full text-center mask-linear-fade">
-                                    <span className="animate-marquee inline-block tracking-widest text-green-400/90">
-                                        {currentPlaylist.tracks[currentTrackIndex]?.title} <span className="text-green-800 mx-2">//</span> {currentPlaylist.tracks[currentTrackIndex]?.artist}
+                                    <span className="animate-marquee inline-block tracking-widest opacity-90" style={{ color: 'var(--lcd-text)' }}>
+                                        {currentPlaylist.tracks[currentTrackIndex]?.title} <span className="opacity-50 mx-2">//</span> {currentPlaylist.tracks[currentTrackIndex]?.artist}
                                     </span>
                                 </div>
                             </div>
                             <div className="flex flex-col items-end">
-                                <span className="text-[10px] text-green-900 uppercase">Mode</span>
-                                <span className="text-[10px] uppercase tracking-widest text-green-600 animate-pulse">{playbackState}</span>
+                                <span className="text-[10px] uppercase opacity-70" style={{ color: 'var(--lcd-subtext)' }}>Mode</span>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={handleShuffle}
+                                        className={`p-1 rounded transition-colors hover:opacity-100 ${isShuffled ? 'opacity-100 bg-white/10' : 'opacity-50'}`}
+                                        style={{ color: 'var(--lcd-text)' }}
+                                        title="Shuffle Shake"
+                                    >
+                                        <Shuffle size={14} />
+                                    </button>
+                                    <span className="text-[10px] uppercase tracking-widest animate-pulse" style={{ color: 'var(--lcd-subtext)' }}>{playbackState}</span>
+                                </div>
                             </div>
                         </div>
 
                         {/* Bottom Row: Time & Progress */}
                         <div className="w-full flex items-center gap-4">
                             {/* Time Display */}
-                            <div className="font-mono text-xs text-green-500 tracking-wider w-20 text-right">
-                                {formatTime(currentTime)} <span className="text-green-900">/</span> {formatTime(duration)}
+                            <div className="text-xs tracking-wider w-20 text-right opacity-90" style={{ color: 'var(--lcd-text)' }}>
+                                {formatTime(currentTime)} <span className="opacity-50">/</span> {formatTime(duration)}
                             </div>
 
-                            {/* Interactive Progress Bar */}
-                            <div className="flex-1 h-3 bg-green-900/20 border border-green-900/30 relative group cursor-pointer">
-                                {/* LCD Segments Background */}
-                                <div className="absolute inset-0 flex gap-[1px] opacity-10">
-                                    {Array.from({ length: 40 }).map((_, i) => (
-                                        <div key={i} className="flex-1 bg-green-900 h-full"></div>
-                                    ))}
-                                </div>
-
-                                {/* Active Progress */}
-                                <div
-                                    className="absolute top-0 left-0 h-full bg-green-500/80 shadow-[0_0_5px_rgba(74,222,128,0.5)] transition-all duration-100 ease-linear"
-                                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                                ></div>
-
-                                {/* Interaction Input */}
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max={duration || 100}
-                                    value={currentTime}
-                                    onChange={(e) => seek(parseFloat(e.target.value))}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            {/* Wavy Progress Bar */}
+                            <div className="flex-1 px-4">
+                                <WavyProgressBar
+                                    currentTime={currentTime}
+                                    duration={duration}
+                                    onSeek={seek}
+                                    amplitude={15}
+                                    frequency={12}
                                 />
                             </div>
                         </div>
 
                     </div>
                 ) : (
-                    <div className="w-full text-center text-green-900/40 uppercase tracking-[0.5em] text-xs relative z-10">Standby</div>
+                    <div className="w-full text-center opacity-40 uppercase tracking-[0.5em] text-xs relative z-10" style={{ color: 'var(--lcd-text)' }}>Standby</div>
                 )}
             </div>
 
